@@ -1,0 +1,15 @@
+version: '3.4'
+
+services:
+  pipelines.client:
+    image: ${DOCKER_REGISTRY-}pipelinesclient
+    build:
+      context: .
+      dockerfile: Pipelines.Client/Dockerfile
+
+  pipelines.server:
+    image: ${DOCKER_REGISTRY-}pipelinesserver
+    build:
+      context: .
+      dockerfile: Pipelines.Server/Dockerfile
+
