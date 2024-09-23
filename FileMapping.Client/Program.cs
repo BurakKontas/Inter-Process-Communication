@@ -1,12 +1,25 @@
-﻿using System;
-using System.IO.MemoryMappedFiles;
+﻿using System.IO.MemoryMappedFiles;
 using System.Text;
 
-var mmf = MemoryMappedFile.OpenExisting("testmap");
-using (var stream = mmf.CreateViewStream())
+Console.WriteLine("Shared memory'ye bağlanılıyor...");
+
+using MemoryMappedFile mmf = MemoryMappedFile.OpenExisting("sharedMemory");
+using MemoryMappedViewAccessor accessor = mmf.CreateViewAccessor();
+
+byte[] messageBytes = new byte[1024];
+
+while (true)
 {
-    byte[] buffer = new byte[1000];
-    stream.Read(buffer, 0, buffer.Length);
-    string message = Encoding.UTF8.GetString(buffer).TrimEnd('\0');
-    Console.WriteLine("Data read from memory mapped file: " + message);
+    // Shared memory'den mesajı oku
+    accessor.ReadArray(0, messageBytes, 0, messageBytes.Length);
+    string message = Encoding.UTF8.GetString(messageBytes).TrimEnd('\0');
+
+    // Boş değilse ekrana yaz
+    if (!string.IsNullOrEmpty(message))
+    {
+        Console.WriteLine($"Server'dan gelen mesaj: {message}");
+    }
+
+    // 1 saniyede bir kontrol et
+    Thread.Sleep(1000);
 }
